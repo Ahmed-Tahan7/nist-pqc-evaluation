@@ -75,4 +75,57 @@ static inline void print_summary_footer(void)
     printf("SLH-DSA signing may exceed budgets on real HW.\n\n");
 }
 
+static inline int write_results_csv(const char *path,
+                                    const BenchResult *results,
+                                    size_t count)
+{
+    FILE *fp = fopen(path, "w");
+    if (!fp) {
+        perror("write_results_csv");
+        return -1;
+    }
+
+    fprintf(fp,
+            "algorithm,operation,trial_num,host_time_us,device_cycles,device_time_ms,"
+            "ble_delay_ms,total_time_ms,energy_uj,pk_bytes,sk_bytes,"
+            "ct_or_sig_bytes,total_ram_bytes,pass_timing,pass_memory,"
+            "pass_energy,pass_overall\n");
+
+    for (size_t i = 0; i < count; i++) {
+        const BenchResult *r = &results[i];
+        double ble_delay_ms = estimate_ble_delay_ms(r->ct_or_sig_bytes);
+
+        for (int t = 0; t < r->num_trials; t++) {
+            double host_us = r->trial_times_us[t];
+            double device_cycles = host_us * HOST_REF_MHZ * CORTEX_M4_PENALTY;
+            double device_time_ms = device_cycles / (DEVICE_CPU_MHZ * 1e3);
+            double energy_uj = device_time_ms * DEVICE_ACTIVE_POWER_MW;
+            double total_ms = device_time_ms + ble_delay_ms;
+
+            fprintf(fp,
+                    "%s,%s,%d,%.2f,%.0f,%.2f,%.2f,%.2f,%.2f,%zu,%zu,%zu,%zu,%d,%d,%d,%d\n",
+                    r->algorithm,
+                    r->operation,
+                    t + 1,
+                    host_us,
+                    device_cycles,
+                    device_time_ms,
+                    ble_delay_ms,
+                    total_ms,
+                    energy_uj,
+                    r->pk_bytes,
+                    r->sk_bytes,
+                    r->ct_or_sig_bytes,
+                    r->total_ram_bytes,
+                    r->pass_timing,
+                    r->pass_memory,
+                    r->pass_energy,
+                    r->pass_overall);
+        }
+    }
+
+    fclose(fp);
+    return 0;
+}
+
 #endif

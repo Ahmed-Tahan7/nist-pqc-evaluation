@@ -62,14 +62,21 @@ void run_bench_slhdsa(BenchResult *out_results, int trials) {
     int kg_trials = (trials > 50) ? 50 : trials;
     printf("  [KeyGen: running %d trials (capped for SLH-DSA)]\n", kg_trials);
 
-    double t_start = now_us();
-    for (int i = 0; i < kg_trials; i++)
+    double *keygen_times = malloc(kg_trials * sizeof(double));
+    double sum_keygen = 0;
+    for (int i = 0; i < kg_trials; i++) {
+        double t0 = now_us();
         OQS_SIG_keypair(sig, pk, sk);
-    double t_keygen_us = (now_us() - t_start) / kg_trials;
+        keygen_times[i] = now_us() - t0;
+        sum_keygen += keygen_times[i];
+    }
+    double t_keygen_us = sum_keygen / kg_trials;
 
     BenchResult r_keygen = {
         .algorithm       = ALG_SHORT,
         .operation       = "KeyGen",
+        .trial_times_us  = keygen_times,
+        .num_trials      = kg_trials,
         .pk_bytes        = sig->length_public_key,
         .sk_bytes        = sig->length_secret_key,
         .ct_or_sig_bytes = 0,
@@ -84,17 +91,23 @@ void run_bench_slhdsa(BenchResult *out_results, int trials) {
     int sign_trials = (trials > 100) ? 100 : trials;
     printf("  [Sign: running %d trials]\n", sign_trials);
 
-    t_start = now_us();
+    double *sign_times = malloc(sign_trials * sizeof(double));
+    double sum_sign = 0;
     for (int i = 0; i < sign_trials; i++) {
         heartbeat_pkt[0] = (uint8_t)i;
+        double t0 = now_us();
         OQS_SIG_sign(sig, signature, &sig_len,
                      heartbeat_pkt, HEARTBEAT_PAYLOAD_BYTES, sk);
+        sign_times[i] = now_us() - t0;
+        sum_sign += sign_times[i];
     }
-    double t_sign_us = (now_us() - t_start) / sign_trials;
+    double t_sign_us = sum_sign / sign_trials;
 
     BenchResult r_sign = {
         .algorithm       = ALG_SHORT,
         .operation       = "Sign",
+        .trial_times_us  = sign_times,
+        .num_trials      = sign_trials,
         .pk_bytes        = 0,
         .sk_bytes        = sig->length_secret_key,
         .ct_or_sig_bytes = sig->length_signature,
@@ -105,16 +118,22 @@ void run_bench_slhdsa(BenchResult *out_results, int trials) {
     print_result(&r_sign);
     out_results[1] = r_sign;
 
-    t_start = now_us();
+    double *verify_times = malloc(trials * sizeof(double));
+    double sum_verify = 0;
     for (int i = 0; i < trials; i++) {
+        double t0 = now_us();
         OQS_SIG_verify(sig, heartbeat_pkt, HEARTBEAT_PAYLOAD_BYTES,
                        signature, sig_len, pk);
+        verify_times[i] = now_us() - t0;
+        sum_verify += verify_times[i];
     }
-    double t_verify_us = (now_us() - t_start) / trials;
+    double t_verify_us = sum_verify / trials;
 
     BenchResult r_verify = {
         .algorithm       = ALG_SHORT,
         .operation       = "Verify",
+        .trial_times_us  = verify_times,
+        .num_trials      = trials,
         .pk_bytes        = sig->length_public_key,
         .sk_bytes        = 0,
         .ct_or_sig_bytes = sig->length_signature,

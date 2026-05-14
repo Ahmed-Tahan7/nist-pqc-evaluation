@@ -39,6 +39,9 @@ typedef struct {
     const char *algorithm;
     const char *operation;
 
+    double *trial_times_us;
+    int num_trials;
+
     double host_time_us;
     double device_cycles;
     double device_time_ms;

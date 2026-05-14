@@ -42,14 +42,21 @@ void run_bench_mlkem(BenchResult *out_results, int trials) {
     OQS_KEM_encaps(kem, ct, ss_e, pk);
     OQS_KEM_decaps(kem, ss_d, ct, sk);
 
-    double t_start = now_us();
-    for (int i = 0; i < trials; i++)
+    double *keygen_times = malloc(trials * sizeof(double));
+    double sum_keygen = 0;
+    for (int i = 0; i < trials; i++) {
+        double t0 = now_us();
         OQS_KEM_keypair(kem, pk, sk);
-    double t_keygen_us = (now_us() - t_start) / trials;
+        keygen_times[i] = now_us() - t0;
+        sum_keygen += keygen_times[i];
+    }
+    double t_keygen_us = sum_keygen / trials;
 
     BenchResult r_keygen = {
         .algorithm        = ALG_SHORT,
         .operation        = "KeyGen",
+        .trial_times_us   = keygen_times,
+        .num_trials       = trials,
         .pk_bytes         = kem->length_public_key,
         .sk_bytes         = kem->length_secret_key,
         .ct_or_sig_bytes  = 0,
@@ -62,14 +69,21 @@ void run_bench_mlkem(BenchResult *out_results, int trials) {
 
     OQS_KEM_keypair(kem, pk, sk);
 
-    t_start = now_us();
-    for (int i = 0; i < trials; i++)
+    double *encaps_times = malloc(trials * sizeof(double));
+    double sum_encaps = 0;
+    for (int i = 0; i < trials; i++) {
+        double t0 = now_us();
         OQS_KEM_encaps(kem, ct, ss_e, pk);
-    double t_encaps_us = (now_us() - t_start) / trials;
+        encaps_times[i] = now_us() - t0;
+        sum_encaps += encaps_times[i];
+    }
+    double t_encaps_us = sum_encaps / trials;
 
     BenchResult r_encaps = {
         .algorithm        = ALG_SHORT,
         .operation        = "Encaps",
+        .trial_times_us   = encaps_times,
+        .num_trials       = trials,
         .pk_bytes         = kem->length_public_key,
         .sk_bytes         = 0,
         .ct_or_sig_bytes  = kem->length_ciphertext,
@@ -82,14 +96,21 @@ void run_bench_mlkem(BenchResult *out_results, int trials) {
     print_result(&r_encaps);
     out_results[1] = r_encaps;
 
-    t_start = now_us();
-    for (int i = 0; i < trials; i++)
+    double *decaps_times = malloc(trials * sizeof(double));
+    double sum_decaps = 0;
+    for (int i = 0; i < trials; i++) {
+        double t0 = now_us();
         OQS_KEM_decaps(kem, ss_d, ct, sk);
-    double t_decaps_us = (now_us() - t_start) / trials;
+        decaps_times[i] = now_us() - t0;
+        sum_decaps += decaps_times[i];
+    }
+    double t_decaps_us = sum_decaps / trials;
 
     BenchResult r_decaps = {
         .algorithm        = ALG_SHORT,
         .operation        = "Decaps",
+        .trial_times_us   = decaps_times,
+        .num_trials       = trials,
         .pk_bytes         = 0,
         .sk_bytes         = kem->length_secret_key,
         .ct_or_sig_bytes  = kem->length_ciphertext,

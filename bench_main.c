@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <unistd.h>
 #include <oqs/oqs.h>
 
 void run_bench_mlkem  (BenchResult *out, int trials);
@@ -10,6 +11,23 @@ void run_bench_mldsa  (BenchResult *out, int trials);
 void run_bench_slhdsa (BenchResult *out, int trials);
 
 #define OPS_PER_ALG 3
+
+static void resolve_csv_path(char *out, size_t out_size)
+{
+    const char *filename = "benchmark_results.csv";
+
+    if (access("CMakeLists.txt", F_OK) == 0) {
+        snprintf(out, out_size, "%s", filename);
+        return;
+    }
+
+    if (access("../CMakeLists.txt", F_OK) == 0) {
+        snprintf(out, out_size, "../%s", filename);
+        return;
+    }
+
+    snprintf(out, out_size, "%s", filename);
+}
 
 int main(void) {
     srand((unsigned int)time(NULL));
@@ -52,6 +70,27 @@ int main(void) {
     print_summary_row(&slhdsa_res[2]);
 
     print_summary_footer();
+
+    BenchResult all_results[OPS_PER_ALG * 3];
+    size_t idx = 0;
+    all_results[idx++] = mlkem_res[0];
+    all_results[idx++] = mlkem_res[1];
+    all_results[idx++] = mlkem_res[2];
+    all_results[idx++] = mldsa_res[0];
+    all_results[idx++] = mldsa_res[1];
+    all_results[idx++] = mldsa_res[2];
+    all_results[idx++] = slhdsa_res[0];
+    all_results[idx++] = slhdsa_res[1];
+    all_results[idx++] = slhdsa_res[2];
+
+    char csv_path[256];
+    resolve_csv_path(csv_path, sizeof(csv_path));
+    if (write_results_csv(csv_path, all_results, idx) == 0)
+        printf("CSV written: %s\n", csv_path);
+
+    for (size_t i = 0; i < idx; i++) {
+        free(all_results[i].trial_times_us);
+    }
 
     OQS_destroy();
     return EXIT_SUCCESS;
