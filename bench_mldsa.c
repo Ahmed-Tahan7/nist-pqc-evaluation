@@ -8,8 +8,7 @@
 #define ALG_NAME  "ML-DSA-65"
 #define ALG_SHORT "ML-DSA"
 
-void run_bench_mldsa(BenchResult *out_results, int trials)
-{
+void run_bench_mldsa(BenchResult *out_results, int trials) {
     printf("\n----------------------------------------------\n");
     printf("  Algorithm  : %s\n", ALG_NAME);
     printf("  Device     : %s\n", DEVICE_NAME);
@@ -116,7 +115,7 @@ void run_bench_mldsa(BenchResult *out_results, int trials)
     double sign_energy_hr   = r_sign.energy_uj * ops_per_min * 60.0;
     double verify_energy_hr = r_verify.energy_uj * ops_per_min * 60.0;
     double total_energy_hr  = sign_energy_hr + verify_energy_hr;
-    double drain_pct_hr     = total_energy_hr / (BATTERY_CAPACITY_MJ * 1000.0) * 100.0;
+    double drain_pct_hr     = (total_energy_hr / 1000.0) / BATTERY_CAPACITY_MJ * 100.0;
 
         printf("\n60 BPM operational projection\n");
     printf("  Sign ops/hr          : %.0f\n",      ops_per_min * 60.0);

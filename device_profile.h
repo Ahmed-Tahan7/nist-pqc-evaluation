@@ -25,7 +25,7 @@
 #define HEARTBEAT_PAYLOAD_BYTES 71
 
 #define BUDGET_ENERGY_PER_OP_UJ  3500.0
-#define BATTERY_CAPACITY_MJ      2538.0
+#define BATTERY_CAPACITY_MJ      2538000.0
 
 typedef struct {
     const char *algorithm;

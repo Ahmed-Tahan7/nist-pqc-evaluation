@@ -8,8 +8,7 @@
 #define ALG_NAME  "ML-KEM-768"
 #define ALG_SHORT "ML-KEM"
 
-void run_bench_mlkem(BenchResult *out_results, int trials)
-{
+void run_bench_mlkem(BenchResult *out_results, int trials) {
     printf("\n----------------------------------------------\n");
     printf("  Algorithm  : %s\n", ALG_NAME);
     printf("  Device     : %s\n", DEVICE_NAME);
@@ -115,8 +114,8 @@ void run_bench_mlkem(BenchResult *out_results, int trials)
                              + r_encaps.energy_uj
                              + r_decaps.energy_uj;
     double sessions_per_hr   = 1.0;
-    double battery_drain_pct = (session_energy_uj * sessions_per_hr)
-                             / (BATTERY_CAPACITY_MJ * 1000.0) * 100.0;
+    double battery_drain_pct = ((session_energy_uj / 1000.0) * sessions_per_hr)
+                             / BATTERY_CAPACITY_MJ * 100.0;
 
     printf("\nSession energy budget\n");
     printf("  Total session energy : %.2f uJ\n", session_energy_uj);

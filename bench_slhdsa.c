@@ -8,8 +8,7 @@
 #define ALG_NAME  "SPHINCS+-SHA2-128s-simple"
 #define ALG_SHORT "SLH-DSA"
 
-void run_bench_slhdsa(BenchResult *out_results, int trials)
-{
+void run_bench_slhdsa(BenchResult *out_results, int trials) {
     printf("\n----------------------------------------------\n");
     printf("  Algorithm  : SLH-DSA-128s (FIPS 205)\n");
     printf("  liboqs id  : %s\n", ALG_NAME);
@@ -135,7 +134,7 @@ void run_bench_slhdsa(BenchResult *out_results, int trials)
     double sig_overhead_pct = (double)sig->length_signature
                             / (double)HEARTBEAT_PAYLOAD_BYTES * 100.0;
     double uplink_bps       = (double)(sig->length_signature
-                            + HEARTBEAT_PAYLOAD_BYTES) * 8.0 * 60.0;
+                            + HEARTBEAT_PAYLOAD_BYTES) * 8.0 * 1.0;
 
         printf("\nBandwidth and overhead analysis\n");
     printf("  Payload size         : %d B\n",     HEARTBEAT_PAYLOAD_BYTES);

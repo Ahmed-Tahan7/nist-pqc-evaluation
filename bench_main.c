@@ -11,14 +11,13 @@ void run_bench_slhdsa (BenchResult *out, int trials);
 
 #define OPS_PER_ALG 3
 
-int main(void)
-{
+int main(void) {
     srand((unsigned int)time(NULL));
     OQS_init();
 
     const int trials = 1000;
 
-    printf("\nPQC Heartbeat IoT Benchmark - MedSim-H1\n");
+    printf("\nPQC Heartbeat IoT Benchmark - %s\n", DEVICE_NAME);
     printf("NIST FIPS 203 / 204 / 205\n");
     printf("Simulated ARM Cortex-M4 @ 80 MHz, 96 KB SRAM\n\n");
     printf("  Device   : %s\n", DEVICE_NAME);
@@ -53,15 +52,6 @@ int main(void)
     print_summary_row(&slhdsa_res[2]);
 
     print_summary_footer();
-
-    printf("Recommendation for medtech IoT deployment\n");
-    printf("Session key exchange -> ML-KEM-768 (FIPS 203)\n");
-    printf("Replaces RSA/ECDH. Encaps/Decaps within budget. Run once/hour.\n");
-    printf("Per-packet signing -> ML-DSA-65 (FIPS 204)\n");
-    printf("Fastest lattice signer. Signature ~3.3 KB. Verify fast enough.\n");
-    printf("Alternative signing -> SLH-DSA-128s (FIPS 205)\n");
-    printf("Conservative security (hash-only). Sign latency likely exceeds 300 ms.\n");
-    printf("Best for infrequent ops (session auth, firmware signing), not per-packet.\n\n");
 
     OQS_destroy();
     return EXIT_SUCCESS;

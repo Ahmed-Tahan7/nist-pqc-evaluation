@@ -18,9 +18,9 @@ static inline double now_us(void)
 static inline void fill_timing(BenchResult *r, double host_us)
 {
     r->host_time_us   = host_us;
-    r->device_cycles  = host_us * HOST_REF_MHZ / DEVICE_CPU_MHZ * CORTEX_M4_PENALTY;
+    r->device_cycles  = host_us * HOST_REF_MHZ * CORTEX_M4_PENALTY;
     r->device_time_ms = r->device_cycles / (DEVICE_CPU_MHZ * 1e3);
-    r->energy_uj      = r->device_time_ms * DEVICE_ACTIVE_POWER_MW * 1e3;
+    r->energy_uj      = r->device_time_ms * DEVICE_ACTIVE_POWER_MW;
 }
 
 static inline void print_result(const BenchResult *r)
@@ -40,7 +40,7 @@ static inline void print_result(const BenchResult *r)
     printf("  Memory OK          : %s\n", r->pass_memory ? "OK" : "FAIL");
     printf("  Energy OK          : %s\n", r->pass_energy ? "OK" : "FAIL");
     printf("  Overall            : %s\n",
-        r->pass_overall ? "FEASIBLE on MedSim-H1"
+        r->pass_overall ? "FEASIBLE on " DEVICE_NAME
                   : "EXCEEDS device constraints");
 }
 
