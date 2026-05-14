@@ -48,16 +48,20 @@ static inline void print_summary_header(void)
 {
     printf("\nBenchmark summary - %s\n", DEVICE_NAME);
     printf("Heartbeat scenario: sign every packet @ 60 BPM; KEM once per session\n");
-    printf("Algorithm     Op         Dev ms   uJ   Sig/CT   RAM KB  Feasible\n");
-    printf("------------------------------------------------------------------\n");
+    printf("Algorithm     Op       CPU ms  Total ms    uJ   Sig/CT  RAM KB  Feasible\n");
+    printf("------------------------------------------------------------------------\n");
 }
 
 static inline void print_summary_row(const BenchResult *r)
 {
-    printf("%-12s %-8s %8.2f %5.1f %7zu %7zu %s\n",
+    double ble_delay_ms = estimate_ble_delay_ms(r->ct_or_sig_bytes);
+    double total_ms     = r->device_time_ms + ble_delay_ms;
+
+    printf("%-12s %-8s %8.2f %8.2f %5.1f %7zu %7zu %s\n",
            r->algorithm,
            r->operation,
            r->device_time_ms,
+           total_ms,
            r->energy_uj,
            r->ct_or_sig_bytes,
            r->total_ram_bytes / 1024,

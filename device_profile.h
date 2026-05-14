@@ -27,6 +27,14 @@
 #define BUDGET_ENERGY_PER_OP_UJ  3500.0
 #define BATTERY_CAPACITY_MJ      2538000.0
 
+// BLE 4.2 effective throughput (bytes/sec, accounting for ATT overhead).
+#define BLE_EFFECTIVE_BPS        25000.0
+
+static inline double estimate_ble_delay_ms(size_t bytes)
+{
+    return (bytes / BLE_EFFECTIVE_BPS) * 1000.0;
+}
+
 typedef struct {
     const char *algorithm;
     const char *operation;
