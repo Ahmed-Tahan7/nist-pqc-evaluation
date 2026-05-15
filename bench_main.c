@@ -12,8 +12,7 @@ void run_bench_slhdsa (BenchResult *out, int trials);
 
 #define OPS_PER_ALG 3
 
-static void resolve_csv_path(char *out, size_t out_size)
-{
+static void resolve_csv_path(char *out, size_t out_size) {
     const char *filename = "benchmark_results.csv";
 
     if (access("CMakeLists.txt", F_OK) == 0) {
@@ -37,7 +36,7 @@ int main(void) {
 
     printf("\nPQC Heartbeat IoT Benchmark - %s\n", DEVICE_NAME);
     printf("NIST FIPS 203 / 204 / 205\n");
-    printf("Simulated ARM Cortex-M4 @ 80 MHz, 96 KB SRAM\n\n");
+    printf("Simulated ARM Cortex-M4 @ 64 MHz, 256 KB SRAM\n\n");
     printf("  Device   : %s\n", DEVICE_NAME);
     printf("  Scenario : Cardiac patch transmitting heartbeat data\n");
     printf("             over BLE to a hospital gateway.\n");
@@ -68,8 +67,6 @@ int main(void) {
     print_summary_row(&slhdsa_res[0]);
     print_summary_row(&slhdsa_res[1]);
     print_summary_row(&slhdsa_res[2]);
-
-    print_summary_footer();
 
     BenchResult all_results[OPS_PER_ALG * 3];
     size_t idx = 0;

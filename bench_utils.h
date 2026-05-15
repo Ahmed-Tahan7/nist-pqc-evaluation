@@ -68,17 +68,7 @@ static inline void print_summary_row(const BenchResult *r)
            r->pass_overall ? "YES" : "NO");
 }
 
-static inline void print_summary_footer(void)
-{
-    printf("\nNote: Device time is lower-bound estimate (host-scaled).\n");
-    printf("Real Cortex-M4 without FPU optimization: ~5-10x slower.\n");
-    printf("SLH-DSA signing may exceed budgets on real HW.\n\n");
-}
-
-static inline int write_results_csv(const char *path,
-                                    const BenchResult *results,
-                                    size_t count)
-{
+static inline int write_results_csv(const char *path, const BenchResult *results, size_t count) {
     FILE *fp = fopen(path, "w");
     if (!fp) {
         perror("write_results_csv");
