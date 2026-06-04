@@ -25,7 +25,11 @@
 #define HEARTBEAT_PAYLOAD_BYTES 71
 
 #define BUDGET_ENERGY_PER_OP_UJ  3500.0
-#define BATTERY_CAPACITY_MJ      2538000.0
+#define BATTERY_CAPACITY_mJ      2538000.0   /* CR2032: 2538 J = 2,538,000 mJ */
+
+/* nRF52840 TX @ 0 dBm: 5.3 mA at 3 V (Product Spec, Table 6) */
+#define BLE_TX_POWER_MW          15.9
+#define BLE_PHY_RATE_MBPS         1.0
 
 // BLE 4.2 effective throughput (bytes/sec, accounting for ATT overhead).
 #define BLE_EFFECTIVE_BPS        25000.0
@@ -45,6 +49,8 @@ typedef struct {
     double host_time_us;
     double device_cycles;
     double device_time_ms;
+    double p95_device_time_ms;
+    double p99_device_time_ms;
 
     size_t pk_bytes;
     size_t sk_bytes;

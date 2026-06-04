@@ -101,7 +101,7 @@ BUDGET_SIG_BYTES       = 4096
 BUDGET_RAM_KB          = 128
 HEARTBEAT_PAYLOAD_B    = 71
 BPM                    = 60
-BATTERY_CAPACITY_MJ    = 2_538_000.0
+BATTERY_CAPACITY_mJ    = 2_538_000.0  # CR2032: 2538 J = 2,538,000 mJ
 BLE_MAX_BPS            = 125_000.0    # bits/s — BLE 4.2 theoretical max
 BLE_EFF_BPS            = 200_000.0    # bits/s  (25 000 bytes/s × 8, device_profile.h)
 
@@ -504,7 +504,7 @@ def figD_battery(df, s):
     hours = np.arange(0, 24.05, 0.1)
 
     def drain_pct(uj_hr, h):
-        return (uj_hr * np.asarray(h) / 1000.0) / BATTERY_CAPACITY_MJ * 100.0
+        return (uj_hr * np.asarray(h) / 1000.0) / BATTERY_CAPACITY_mJ * 100.0
 
     fig, ax = plt.subplots(figsize=(9, 5.5))
 
@@ -541,7 +541,7 @@ def figD_battery(df, s):
     ax.set_xlim(0, 24)
     ax.set_title(
         "Fig. D  Cumulative CR2032 Battery Drain — 24-Hour Clinical Operation\n"
-        f"CR2032 = {BATTERY_CAPACITY_MJ / 1e6:.2f} J  ·  "
+        f"CR2032 = {BATTERY_CAPACITY_mJ / 1000.0:.0f} J  ·  "
         f"Active power model: {DEVICE_ACTIVE_POWER_MW} mW  ·  HR = {BPM} BPM",
         loc="left", fontsize=10
     )

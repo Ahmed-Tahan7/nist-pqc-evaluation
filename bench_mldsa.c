@@ -94,6 +94,7 @@ void run_bench_mldsa(BenchResult *out_results, int trials) {
         .total_ram_bytes = sig->length_secret_key + sig->length_signature
     };
     fill_timing(&r_sign, t_sign_us);
+    fill_percentiles(&r_sign);
     evaluate_constraints(&r_sign, BUDGET_SIGN_MS, BUDGET_SIG_BYTES);
     print_result(&r_sign);
     out_results[1] = r_sign;
@@ -131,16 +132,24 @@ void run_bench_mldsa(BenchResult *out_results, int trials) {
             vrc == OQS_SUCCESS ? "OK" : "FAIL");
 
     double ops_per_min      = 60.0;
+    double ble_tx_uj        = estimate_ble_tx_energy_uj(sig->length_signature);
+    double total_op_energy  = r_sign.energy_uj + ble_tx_uj;
     double sign_energy_hr   = r_sign.energy_uj * ops_per_min * 60.0;
+    double ble_tx_energy_hr = ble_tx_uj * ops_per_min * 60.0;
     double verify_energy_hr = r_verify.energy_uj * ops_per_min * 60.0;
-    double total_energy_hr  = sign_energy_hr + verify_energy_hr;
-    double drain_pct_hr     = (total_energy_hr / 1000.0) / BATTERY_CAPACITY_MJ * 100.0;
+    double crypto_energy_hr = sign_energy_hr + verify_energy_hr;
+    double total_energy_hr  = crypto_energy_hr + ble_tx_energy_hr;
+    double drain_pct_hr     = (total_energy_hr / 1000.0) / BATTERY_CAPACITY_mJ * 100.0;
 
         printf("\n60 BPM operational projection\n");
     printf("  Sign ops/hr          : %.0f\n",      ops_per_min * 60.0);
+        printf("  BLE TX energy/sign   : %.2f uJ\n",  ble_tx_uj);
+        printf("  Total energy (sign+TX): %.2f uJ\n", total_op_energy);
         printf("  Sign energy/hr       : %.2f uJ\n",   sign_energy_hr);
+        printf("  BLE TX energy/hr     : %.2f uJ\n",   ble_tx_energy_hr);
         printf("  Verify energy/hr     : %.2f uJ\n",   verify_energy_hr);
-        printf("  Total crypto energy/hr: %.2f uJ\n",  total_energy_hr);
+        printf("  Total crypto energy/hr: %.2f uJ\n",  crypto_energy_hr);
+        printf("  Total energy/hr      : %.2f uJ\n",   total_energy_hr);
     printf("  Battery drain/hr     : %.4f%% of CR2032\n", drain_pct_hr);
         printf("  Bandwidth: sig=%zu B x 60 BPM = %.1f B/s uplink\n",
            sig->length_signature,

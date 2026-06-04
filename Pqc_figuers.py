@@ -88,7 +88,7 @@ BUDGET_DECAPS_MS       = 500.0
 BUDGET_ENERGY_UJ       = 3500.0
 BUDGET_SIG_BYTES       = 4096
 BUDGET_RAM_KB          = 128
-BATTERY_CAPACITY_MJ    = 2_538_000.0
+BATTERY_CAPACITY_mJ    = 2_538_000.0  # CR2032: 2538 J = 2,538,000 mJ
 # FIX: unified to device_profile.h BLE_EFFECTIVE_BPS = 25 000 bytes/s
 BLE_EFFECTIVE_BPS      = 25_000.0   # bytes/s  ← matches device_profile.h
 BLE_MAX_BPS            = 125_000.0  # bits/s   ← BLE 4.2 theoretical max
@@ -502,7 +502,7 @@ def fig08_battery(df, s):
     hours = np.arange(0, 25)
 
     def drain_pct(uj_hr, h):
-        return (uj_hr * h / 1000.0) / BATTERY_CAPACITY_MJ * 100.0
+        return (uj_hr * h / 1000.0) / BATTERY_CAPACITY_mJ * 100.0
 
     fig, ax = plt.subplots(figsize=(8, 5))
 
@@ -525,7 +525,7 @@ def fig08_battery(df, s):
     ax.set_xlim(0, 24)
     ax.set_title(
         "Fig. 8  Cumulative Battery Drain Projection\n"
-        f"CR2032 = {BATTERY_CAPACITY_MJ/1e6:.2f} J  |  "
+        f"CR2032 = {BATTERY_CAPACITY_mJ/1000.0:.0f} J  |  "
         f"Active power = {DEVICE_ACTIVE_POWER_MW} mW"
     )
     ax.legend(framealpha=0.9, loc="upper left")
@@ -552,11 +552,11 @@ def fig08_battery(df, s):
     # FIX: inset table showing exact drain values
     col_labels = ["Algorithm", "Drain / hr", "Drain @ 24 h"]
     table_data = [
-        ["ML-DSA-65",    f"{mldsa_uj_hr/BATTERY_CAPACITY_MJ*1e3*3.6:.5f}%",
+        ["ML-DSA-65",    f"{mldsa_uj_hr/BATTERY_CAPACITY_mJ*1e3*3.6:.5f}%",
                          f"{drain_pct(mldsa_uj_hr,24):.4f}%"],
-        ["ML-KEM-768",   f"{mlkem_uj_hr/BATTERY_CAPACITY_MJ*1e3*3.6:.5f}%",
+        ["ML-KEM-768",   f"{mlkem_uj_hr/BATTERY_CAPACITY_mJ*1e3*3.6:.5f}%",
                          f"{drain_pct(mlkem_uj_hr,24):.4f}%"],
-        ["SLH-DSA-128s", f"{slhdsa_uj_hr/BATTERY_CAPACITY_MJ*1e3*3.6:.3f}%",
+        ["SLH-DSA-128s", f"{slhdsa_uj_hr/BATTERY_CAPACITY_mJ*1e3*3.6:.3f}%",
                          f"{drain_pct(slhdsa_uj_hr,24):.3f}%"],
     ]
     tbl = ax.table(cellText=table_data, colLabels=col_labels,

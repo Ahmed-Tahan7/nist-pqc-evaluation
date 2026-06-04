@@ -136,7 +136,7 @@ void run_bench_mlkem(BenchResult *out_results, int trials) {
                              + r_decaps.energy_uj;
     double sessions_per_hr   = 1.0;
     double battery_drain_pct = ((session_energy_uj / 1000.0) * sessions_per_hr)
-                             / BATTERY_CAPACITY_MJ * 100.0;
+                             / BATTERY_CAPACITY_mJ * 100.0;
 
     printf("\nSession energy budget\n");
     printf("  Total session energy : %.2f uJ\n", session_energy_uj);

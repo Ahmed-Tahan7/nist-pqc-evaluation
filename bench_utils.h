@@ -3,6 +3,7 @@
 
 #include "device_profile.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 
 static inline double now_us(void)
@@ -23,11 +24,49 @@ static inline void fill_timing(BenchResult *r, double host_us)
     r->energy_uj      = r->device_time_ms * DEVICE_ACTIVE_POWER_MW;
 }
 
+static inline int cmp_dbl(const void *a, const void *b)
+{
+    double x = *(const double *)a;
+    double y = *(const double *)b;
+    return (x > y) - (x < y);
+}
+
+static inline void fill_percentiles(BenchResult *r)
+{
+    if (!r->trial_times_us || r->num_trials < 2)
+        return;
+
+    double *s = malloc((size_t)r->num_trials * sizeof(double));
+    if (!s)
+        return;
+
+    for (int i = 0; i < r->num_trials; i++) {
+        s[i] = r->trial_times_us[i] * HOST_REF_MHZ * CORTEX_M4_PENALTY
+             / (DEVICE_CPU_MHZ * 1e3);
+    }
+
+    qsort(s, (size_t)r->num_trials, sizeof(double), cmp_dbl);
+    r->p95_device_time_ms = s[(int)(0.95 * (r->num_trials - 1))];
+    r->p99_device_time_ms = s[(int)(0.99 * (r->num_trials - 1))];
+
+    free(s);
+}
+
+static inline double estimate_ble_tx_energy_uj(size_t bytes)
+{
+    double tx_time_ms = (bytes * 8.0) / (BLE_PHY_RATE_MBPS * 1e6) * 1e3;
+    return tx_time_ms * BLE_TX_POWER_MW;
+}
+
 static inline void print_result(const BenchResult *r)
 {
     printf("\n%s %s\n", r->algorithm, r->operation);
     printf("  Host time          : %8.2f us\n",  r->host_time_us);
     printf("  Device time (est.) : %8.2f ms\n", r->device_time_ms);
+    if (r->p95_device_time_ms > 0)
+        printf("  p95 device time    : %8.2f ms\n", r->p95_device_time_ms);
+    if (r->p99_device_time_ms > 0)
+        printf("  p99 device time    : %8.2f ms\n", r->p99_device_time_ms);
     printf("  Device cycles      : %8.0f\n",     r->device_cycles);
     printf("  Energy / op        : %8.2f uJ (budget %.0f uJ)\n",
         r->energy_uj, BUDGET_ENERGY_PER_OP_UJ);
