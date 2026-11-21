@@ -4,6 +4,27 @@
 
 This README summarizes the benchmark output from `cmake-build-debug/pqc_fault_analysis` for NIST post-quantum algorithms in a heartbeat IoT scenario.
 
+## Publication
+
+The results from this project are published in an IEEE conference paper:
+
+**Securing the Heartbeat: An Estimation Study on the Feasibility of NIST Post-Quantum Cryptography on a Wearable Cardiac Patch**
+Ahmed Tahan, Ezzeldin Salah, Omar Elnazly, Ziad Mohamed, Samir A. Elsagheer
+2026 International Conference on Advancements in Smart, Secure and Intelligent Computing (ASSIC), IEEE. https://ieeexplore.ieee.org/document/11717249
+
+If you use this benchmark or its results, please cite the paper:
+
+```bibtex
+@inproceedings{pqc_heartbeat_nrf52840_2026,
+  title     = {Securing the Heartbeat: An Estimation Study on the Feasibility of {NIST} Post-Quantum Cryptography on a Wearable Cardiac Patch},
+  author    = {Tahan, Ahmed and Salah, Ezzeldin and Elnazly, Omar and Mohamed, Ziad and Elsagheer, Samir A.},
+  booktitle = {2026 International Conference on Advancements in Smart, Secure and Intelligent Computing (ASSIC)},
+  year      = {2026},
+  publisher = {IEEE},
+  url       = {https://ieeexplore.ieee.org/document/11717249}
+}
+```
+
 ## Device and scenario
 
 - Device: Nordic nRF52840 (Cortex-M4F @ 64 MHz)
